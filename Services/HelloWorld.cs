@@ -27,7 +27,7 @@ public class HelloWorld
         _logger = log;
     }
 
-
+            
     [FunctionName("PostBusNotice")]
     [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
     [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(BusNotice), Description = "BusNotice", Required = true)]
@@ -41,13 +41,40 @@ public class HelloWorld
         var busNotice = JsonConvert.DeserializeObject<BusNotice>(requestBody);
         busNotices.Add(busNotice);
 
-        _ = new Task(async () => await processNotice(busNotice));
-
+        _ = Task.Run(async () => await processNotice(busNotice));
+        
         return new OkResult();
     }
 
+    [FunctionName("GetProcessedNotices")]
+    [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ProcessedNotice), Description = "The OK response")]
+    public async Task<IActionResult> GetProcessedNotices(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processedNotices")] HttpRequest req)
+    {
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+        
+        return new OkObjectResult(processedNotices);
+    }
+
+    [FunctionName("GetBusNotices")]
+    [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(BusNotice), Description = "The OK response")]
+    public async Task<IActionResult> GetBusNotices(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "busNotices")] HttpRequest req)
+    {
+        _logger.LogInformation("C# HTTP trigger function processed a request.");
+        
+        return new OkObjectResult(busNotices);
+    }
+
+
     private async Task processNotice(BusNotice busNotice)
     {
+
+        PredictionHelper predictionHelper = new();
+        var res = predictionHelper.PredictImage(busNotice.Base64Image);
+
         // TODO: Aus Request
         var lat = "51.9546558";
         var lo = "7.6262226";
@@ -59,25 +86,4 @@ public class HelloWorld
         processedNotices.Add(processedNotice);
     }
 
-    [FunctionName("GetProcessedNotices")]
-    [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
-    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ProcessedNotice), Description = "The OK response")]
-    public async Task<IActionResult> GetProcessedNotices(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processedNotices")] HttpRequest req)
-    {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
-
-        return new OkObjectResult(processedNotices);
-    }
-
-    [FunctionName("GetBusNotices")]
-    [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
-    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(BusNotice), Description = "The OK response")]
-    public async Task<IActionResult> GetBusNotices(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "busNotices")] HttpRequest req)
-    {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
-
-        return new OkObjectResult(busNotices);
-    }
 }
