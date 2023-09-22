@@ -6,6 +6,8 @@ public class ProcessedNotice
 {
 
     public string Base64Image { get; set; }
+    public string Base64ImageCar { get; set; }
+    public string Base64ImageLicensePlate { get; set; }
     public string ImageContentType { get; set; }
     public Address Address { get; set; }
     public string Latitude { get; set; }

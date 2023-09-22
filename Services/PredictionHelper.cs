@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
-using Microsoft.Azure.WebJobs.Script.Description;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 
 namespace ScanBus.Function;
 
 public class PredictionHelper{
 
-    private static readonly string Endpoint = "https://scanbus.cognitiveservices.azure.com/";
-    private static readonly string PredictionKey = "438cbb64702d461ebe1cf91c3ee42e4d";
-    private static readonly Guid ProjectId =  Guid.Parse("5ed0919b-f827-4af8-b708-beeb80072ec1");
-    private static readonly string PublishedName = "ScanBus";
+    private static readonly string Endpoint = "https://scanbus-prediction.cognitiveservices.azure.com";
+    private static readonly string PredictionKey = "8122633cfddc4b99a6a2fac83fa42097";
+    private static readonly Guid ProjectId =  Guid.Parse("6243e34d-217b-4d21-b28b-8bfeff52c37c");
+    private static readonly string PublishedModelName = "Iteration1";
 
     private readonly CustomVisionPredictionClient predictionApi;
 
@@ -27,18 +28,38 @@ public class PredictionHelper{
         };
     }
 
-    public Dictionary<string, double> PredictImage(string Base64Image)
+    public List<Prediction> PredictImage(string Base64Image)
     {
         using MemoryStream stream = new MemoryStream(Convert.FromBase64String(Base64Image));
+        var result = predictionApi.DetectImage(ProjectId, PublishedModelName, stream);
         
-        var result = predictionApi.ClassifyImage(ProjectId, PublishedName, stream);
-        
-        Dictionary<string, double> predictions = new ();
+        List<Prediction> predictions = new ();
         
         foreach(var c in result.Predictions)
         {
-            predictions.Add(c.TagName, c.Probability);
+            if(c.Probability >= 0.9){
+                predictions.Add(new Prediction(){
+                    Tag = c.TagName, 
+                    Probability = c.Probability,
+                    Top = c.BoundingBox.Top,
+                    Height = c.BoundingBox.Height,
+                    Left = c.BoundingBox.Left,
+                    Width = c.BoundingBox.Width
+                    });
+            }
         }
         return predictions;
+    }
+
+    public static string CropImage(string Base64Image, double x, double y, double width, double height)
+    {
+        using var stream = new MemoryStream(Convert.FromBase64String(Base64Image));
+        using var outStream = new MemoryStream();
+        using (var image = Image.Load(stream))
+        {
+            image.Mutate(i => i.Crop(new Rectangle(){X = (int)(image.Bounds.Width * x), Y = (int)(image.Bounds.Height * y), Height = (int)(image.Bounds.Height * height), Width = (int)(image.Bounds.Width * width)}));
+            image.Save(outStream, new JpegEncoder());
+        }
+        return Convert.ToBase64String(outStream.ToArray());
     }
 }
