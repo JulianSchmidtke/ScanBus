@@ -1,2 +1,13 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<div>
+	<a href="/bus" role="button">Busfahrer</a>
+	<a href="/control" role="button">Leitstelle</a>
+</div>
+
+<style>
+	a {
+		display: inline-block;
+		height: 2rem;
+		border-radius: 1rem;
+		border: 1px solid red;
+	}
+</style>
