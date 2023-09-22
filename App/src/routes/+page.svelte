@@ -1,9 +1,12 @@
-<script>
-	import { Center } from '@svelteuidev/core';
-	import { Button } from '@svelteuidev/core';
-</script>
+<main>
+	<a href="/bus">Busfahrer</a>
+	<a href="/control">Leitstelle</a>
+</main>
 
-<Center>
-	<Button href="/bus" radius="xs" size="md">Busfahrer</Button>
-	<Button href="/control" radius="xs" size="md">Leitstelle</Button>
-</Center>
+<style>
+	:global(html, body) {
+		padding: 0;
+		margin: 0;
+		font-family: sans-serif;
+	}
+</style>
