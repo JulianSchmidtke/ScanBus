@@ -1,11 +1,20 @@
 <script>
+	import { onMount } from 'svelte';
+
 	let time = new Date();
+
+	onMount(() => {
+		const interval = window.setInterval(() => {
+			time = new Date();
+		}, 250);
+		return () => window.clearInterval(interval);
+	});
 </script>
 
 <header>
 	<div class="home-icon"><span class="mdi mdi-home" /></div>
 	<div class="header-text">
-		<h1>34 Ringline 🪦</h1>
+		<h1>34 Ringlinie 🪦</h1>
 		<h2>{time.toLocaleTimeString('de-DE')}</h2>
 	</div>
 
@@ -40,18 +49,41 @@
 	<div class="col2">
 		<h3>Ticketübersicht</h3>
 		<div class="options-grid">
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
-			<div />
+			<div style="background-color: #E99437;">
+				<p>Einzelticket<br />&nbsp;</p>
+				<div class="mdi mdi-folder" />
+			</div>
+			<div style="background-color: #E99437;">
+				<p>Zeitkarte Gültigkeit</p>
+				<div class="mdi mdi-folder" />
+			</div>
+			<div style="background-color: #E99437;">
+				<p>Gruppe + MFK</p>
+				<div class="mdi mdi-folder" />
+			</div>
+			<div style="background-color: #E7D640; color: #223347;">
+				<p>Zeitkarte Woche</p>
+				<div class="mdi mdi-folder" />
+			</div>
+			<div style="background-color: #E7D640; color: #223347;">
+				<p>Zeitkarte Monat</p>
+				<div class="mdi mdi-folder" />
+			</div>
+			<div style="background-color: #E7D640; color: #223347;">
+				<p>Zeitkarte<br /> Jahr</p>
+				<div class="mdi mdi-folder" />
+			</div>
+			<div style="background-color: #7EB03F;">
+				<p>Verkaufs-<br />gültigkeit</p>
+				<div class="mdi mdi-folder" />
+			</div>
+			<div style="background-color: #223347;" />
+			<div style="background-color: #223347;" />
+			<div style="background-color: #223347;" />
+			<div style="background-color: #2FA29B;">
+				<p>Letztes <br />Ticket</p>
+			</div>
+			<div style="background-color: #223347;" />
 		</div>
 	</div>
 	<div class="col3">
@@ -65,10 +97,10 @@
 				<div class="mdi mdi-cart-plus" />
 			</div>
 		</div>
-		<div class="mdi mdi-printer">Drucken</div>
+		<div class="mdi mdi-printer">&nbsp;Drucken</div>
 		<div class="paper">
 			<label for="paper">Papier: </label>
-			<progress id="paper" max="100" value="50">0%</progress>
+			<progress id="paper" max="100" value="0">0%</progress>
 		</div>
 		<div class="more-buttons">
 			<div class="mdi mdi-dots-horizontal" />
@@ -152,11 +184,11 @@
 	.col1 .col1-element {
 		margin: 16px;
 		padding-inline: 4rem;
-		padding-block: 2rem;
+		padding-block: 1.1rem;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		font-size: 2.5rem;
+		font-size: 2.25rem;
 		background-color: #38a9e5;
 	}
 
@@ -178,11 +210,24 @@
 		grid-template-rows: repeat(4, 1fr);
 		grid-column-gap: 16px;
 		grid-row-gap: 16px;
+		line-height: 1.25;
 	}
 
-	.options-grid div {
+	.options-grid > div {
 		background-color: white;
 		aspect-ratio: 1;
+		font-size: 1.5rem;
+	}
+
+	.options-grid div p {
+		margin: 32px;
+		margin-bottom: 16px;
+	}
+
+	.options-grid div .mdi {
+		text-align: end;
+		font-size: 4rem;
+		margin-inline: 16px;
 	}
 
 	.col3 {
