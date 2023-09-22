@@ -17,56 +17,36 @@ namespace ScanBus.Function
     {
         private readonly ILogger<HelloWorld> _logger;
 
-        private List<BusNotice> busNotices = new ();
-        private List<ProcessedNotice> processedNotices = new();
+        private static List<BusNotice> busNotices = new ();
+        private static List<ProcessedNotice> processedNotices = new();
 
         public HelloWorld(ILogger<HelloWorld> log)
         {
             _logger = log;
         }
 
-        [FunctionName("HelloWorld")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
-        [OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
+                
+        [FunctionName("PostBusNotice")]
+        [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
+        [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(BusNotice), Description = "BusNotice", Required = true)]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Description = "The OK response")]
+        public async Task<IActionResult> PostBusNotice(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "busNotices")] HttpRequest req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
-
-            string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
-        }
-        
-        [FunctionName("PostBusNotice")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
-        [OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
-        public async Task<IActionResult> PostNotice(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "busNotices")] HttpRequest req, [FromBody] BusNotice notice)
-        {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-
-
+            var busNotice = JsonConvert.DeserializeObject<BusNotice>(requestBody);
+            busNotices.Add(busNotice);
             
             return new OkResult();
         }
 
         [FunctionName("GetProcessedNotices")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
-        [OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
+        [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(ProcessedNotice), Description = "The OK response")]
         public async Task<IActionResult> GetProcessedNotices(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "notices")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "processedNotices")] HttpRequest req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
             
@@ -74,18 +54,15 @@ namespace ScanBus.Function
         }
 
         [FunctionName("GetBusNotices")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
-        [OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
-        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(string), Description = "The OK response")]
+        [OpenApiOperation(operationId: "Run", tags: new[] { "ScanBus" })]
+        [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(BusNotice), Description = "The OK response")]
         public async Task<IActionResult> GetBusNotices(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "notices")] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "busNotices")] HttpRequest req)
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
             
             return new OkObjectResult(busNotices);
         }
-
-        
     }
 }
 
