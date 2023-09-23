@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import imageBase64 from '$env/static/private/image.txt';
+	import imageBase64 from '../../../static/image.txt?raw';
 
 	let time = new Date();
 	let modalOpen = false;
@@ -18,26 +18,27 @@
 
 	let fetchTimeout = -1;
 	$: {
-		if (!modalOpen) {
-			if (fetchTimeout > 0) window.clearTimeout(fetchTimeout);
-		} else {
-			fetchTimeout = window.setTimeout(async () => {
-				console.log('Sending img to api');
+		if (typeof window !== undefined) {
+			if (!modalOpen) {
+				if (fetchTimeout > 0) window.clearTimeout(fetchTimeout);
+			} else {
+				fetchTimeout = window.setTimeout(async () => {
+					console.log('Sending img to api');
 
-				var busNotice = {
-					BusId: '1',
-					Driver: '2',
-					latitude: '51.954655',
-					longitude: '7.6262226',
-					utcTimeStamp: '1977-05-08T04:02:33.700Z',
-					ImageContentType: 'media/jpeg',
-					Base64Image: imageBase64
-				};
-				console.log(busNotice);
-				await sendBusNotice();
-
-				// TODO send img to api
-			}, 4000);
+					var busNotice = {
+						BusId: '1',
+						Driver: '2',
+						latitude: '51.954655',
+						longitude: '7.6262226',
+						utcTimeStamp: '1977-05-08T04:02:33.700Z',
+						ImageContentType: 'media/jpeg',
+						Base64Image: imageBase64
+					};
+					console.log(busNotice);
+					modalOpen = false;
+					await sendBusNotice();
+				}, 4000);
+			}
 		}
 	}
 </script>
@@ -143,7 +144,7 @@
 	<div class="modal" style:display={modalOpen ? 'block' : 'none'}>
 		<div class="modal-content">
 			<h1>Meldung abschicken?</h1>
-			<img src="https://source.unsplash.com/random/400x300/?nature,plants,dark=" />
+			<img src="data:image/jpeg;base64, {imageBase64}" />
 			<div class="buttons">
 				<div class="notify-button {modalOpen ? 'animate-button' : ''}">Melden</div>
 				<div class="cancel-button">Abbrechen</div>
@@ -370,28 +371,13 @@
 	}
 
 	.modal-content .buttons .notify-button {
-		position: relative;
 		display: inline-block;
-		z-index: 10;
 		padding: 1rem;
 		padding-inline: 3.5rem;
 		outline: 1px solid #9b2353;
-	}
-
-	.modal-content .buttons .notify-button::before {
-		content: '';
-		position: absolute;
 		background-color: #9b2353;
-		z-index: 5;
-		top: 0;
-		left: 0;
-		right: 100%;
-		bottom: 0;
-		transition: right 4s ease-in;
-	}
-
-	.modal-content .buttons .notify-button.animate-button::before {
-		right: 0;
+		animation-name: fade-in-button;
+		animation-duration: 4s;
 	}
 
 	.modal-content .buttons .cancel-button {
@@ -408,6 +394,15 @@
 		to {
 			top: 175px;
 			opacity: 1;
+		}
+	}
+
+	@keyframes fade-in-button {
+		from {
+			background-color: transparent;
+		}
+		to {
+			background-color: #9b2353;
 		}
 	}
 </style>
