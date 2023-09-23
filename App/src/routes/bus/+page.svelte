@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 
 	let time = new Date();
+	let modalOpen = false;
 
 	onMount(() => {
 		const interval = window.setInterval(() => {
@@ -9,6 +10,10 @@
 		}, 250);
 		return () => window.clearInterval(interval);
 	});
+
+	const handleIconClick = () => {
+		modalOpen = true;
+	};
 </script>
 
 <header>
@@ -30,7 +35,7 @@
 		<div class="col1-element">
 			<div class="mdi mdi-map" />
 		</div>
-		<div class="col1-element" style="background-color: #9B2353;">
+		<div class="col1-element" style="background-color: #9B2353;" on:click={handleIconClick}>
 			<div class="mdi mdi-car-off" />
 		</div>
 		<div class="col1-element" style="background-color: #2FA29B;">
@@ -108,6 +113,17 @@
 			<div class="mdi mdi-cancel" />
 		</div>
 	</div>
+
+	<div class="modal" style:display={modalOpen ? 'block' : 'none'}>
+		<div class="modal-content">
+			<h1>Meldung abschicken?</h1>
+			<img src="https://source.unsplash.com/random/400x300/?nature,plants,dark=" />
+			<div class="buttons">
+				<div class="notify-button">Melden</div>
+				<div class="cancel-button">Abbrechen</div>
+			</div>
+		</div>
+	</div>
 </main>
 
 <style>
@@ -162,7 +178,7 @@
 	}
 
 	main {
-		max-height: calc(100vh - 6rem - 32px);
+		max-height: calc(100vh - 6rem - 16px);
 		padding-block: 1rem;
 		display: flex;
 		justify-content: stretch;
@@ -200,6 +216,7 @@
 		border: 2px solid #38a9e5;
 		padding-inline: 16px;
 		overflow-y: scroll;
+		margin-bottom: 16px;
 	}
 
 	.col2 > .options-grid {
@@ -284,5 +301,63 @@
 		background-color: #38a9e5;
 		color: white;
 		font-size: 1.5rem;
+	}
+
+	.modal {
+		position: fixed;
+		z-index: 1;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+		background-color: rgba(0, 0, 0, 0.4);
+	}
+
+	.modal-content {
+		position: relative;
+		background-color: #395a7b;
+		margin: auto;
+		top: 200px;
+		padding: 16px;
+		width: 40%;
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+		animation-name: animatetop;
+		animation-duration: 0.4s;
+	}
+
+	.modal-content img {
+		display: block;
+		width: 100%;
+		margin: 0 auto;
+	}
+
+	.modal-content .buttons {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.modal-content .buttons .notify-button {
+		display: inline-block;
+		padding: 1rem;
+		outline: 1px solid #9b2353;
+		background-color: rgba(155, 35, 83, 0.3);
+	}
+
+	.modal-content .buttons .cancel-button {
+		display: inline-block;
+		padding: 1rem;
+		background-color: #38a9e5;
+	}
+
+	@keyframes animatetop {
+		from {
+			top: -300px;
+			opacity: 0;
+		}
+		to {
+			top: 200px;
+			opacity: 1;
+		}
 	}
 </style>
