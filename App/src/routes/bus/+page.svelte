@@ -78,12 +78,9 @@
 				<div class="mdi mdi-folder" />
 			</div>
 			<div style="background-color: #223347;" />
-			<div style="background-color: #223347;" />
-			<div style="background-color: #223347;" />
 			<div style="background-color: #2FA29B;">
 				<p>Letztes <br />Ticket</p>
 			</div>
-			<div style="background-color: #223347;" />
 		</div>
 	</div>
 	<div class="col3">
@@ -100,7 +97,7 @@
 		<div class="mdi mdi-printer">&nbsp;Drucken</div>
 		<div class="paper">
 			<label for="paper">Papier: </label>
-			<progress id="paper" max="100" value="0">0%</progress>
+			<progress id="paper" max="100" value="75">75%</progress>
 		</div>
 		<div class="more-buttons">
 			<div class="mdi mdi-dots-horizontal" />
@@ -165,7 +162,7 @@
 	}
 
 	main {
-		min-height: calc(100vh - 4rem);
+		max-height: calc(100vh - 6rem - 32px);
 		padding-block: 1rem;
 		display: flex;
 		justify-content: stretch;
@@ -199,15 +196,16 @@
 	}
 
 	.col2 {
-		flex-grow: 1.3;
+		flex-grow: 1.1;
 		border: 2px solid #38a9e5;
 		padding-inline: 16px;
+		overflow-y: scroll;
 	}
 
 	.col2 > .options-grid {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		grid-template-rows: repeat(4, 1fr);
+		grid-template-rows: repeat(3, 1fr);
 		grid-column-gap: 16px;
 		grid-row-gap: 16px;
 		line-height: 1.25;
@@ -216,12 +214,11 @@
 	.options-grid > div {
 		background-color: white;
 		aspect-ratio: 1;
-		font-size: 1.5rem;
+		font-size: 1.25rem;
 	}
 
 	.options-grid div p {
-		margin: 32px;
-		margin-bottom: 16px;
+		margin: 16px;
 	}
 
 	.options-grid div .mdi {
@@ -231,7 +228,7 @@
 	}
 
 	.col3 {
-		flex-grow: 1;
+		flex-grow: 1.1;
 		padding-right: 16px;
 	}
 
