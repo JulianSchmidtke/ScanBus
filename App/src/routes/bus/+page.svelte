@@ -62,8 +62,8 @@
 		<div class="col1-element">
 			<div class="mdi mdi-map" />
 		</div>
-		<div class="col1-element" style="background-color: #9B2353;" on:click={handleIconClick}>
-			<div class="mdi mdi-car-off" />
+		<div class="col1-element keep" style="background-color: #9B2353;" on:click={handleIconClick}>
+			<div class="mdi mdi-car-off keep" />
 		</div>
 		<div class="col1-element" style="background-color: #2FA29B;">
 			<div class="mdi mdi-email" />
@@ -210,6 +210,15 @@
 		display: flex;
 		justify-content: stretch;
 		gap: 1rem;
+	}
+	header > *,
+	.col2,
+	.col3 {
+		opacity: 0.6;
+	}
+
+	.col1 :not(.keep) {
+		opacity: 0.6;
 	}
 
 	.col1 {
