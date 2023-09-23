@@ -13,9 +13,8 @@ public class CoordService
     {
         string apiUrl = $"https://geocode.maps.co/reverse?lat={latitude}&lon={longitude}";
 
-        GeoCode geoCode = null;
         HttpResponseMessage response = await client.GetAsync(apiUrl);
-        geoCode = await response.Content.ReadAsAsync<GeoCode>();
+        GeoCode geoCode = await response.Content.ReadAsAsync<GeoCode>();
 
         return geoCode.Address;
     }
