@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import imageBase64 from '$env/static/private/image.txt';
 
 	let time = new Date();
 	let modalOpen = false;
@@ -20,8 +21,21 @@
 		if (!modalOpen) {
 			if (fetchTimeout > 0) window.clearTimeout(fetchTimeout);
 		} else {
-			fetchTimeout = window.setTimeout(() => {
+			fetchTimeout = window.setTimeout(async () => {
 				console.log('Sending img to api');
+
+				var busNotice = {
+					BusId: '1',
+					Driver: '2',
+					latitude: '51.954655',
+					longitude: '7.6262226',
+					utcTimeStamp: '1977-05-08T04:02:33.700Z',
+					ImageContentType: 'media/jpeg',
+					Base64Image: imageBase64
+				};
+				console.log(busNotice);
+				await sendBusNotice();
+
 				// TODO send img to api
 			}, 4000);
 		}

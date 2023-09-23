@@ -1,6 +1,6 @@
 const baseUrl = "http://localhost:7071/api"
 
-function sendBusNotice(busNotice: BusNotice) {
+function sendBusNotice(busNotice) {
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
@@ -15,7 +15,7 @@ function sendBusNotice(busNotice: BusNotice) {
   fetch(`${baseUrl}/busNotices`, requestOptions)
 }
 
-async function getBusNotices(): Promise<ProcessedNotice[]> {
+async function getBusNotices() {
   var requestOptions = {
     method: 'GET',
   };
@@ -26,7 +26,7 @@ async function getBusNotices(): Promise<ProcessedNotice[]> {
   return notice
 }
 
-async function getBusNotice(id: number): Promise<ProcessedNotice> {
+async function getBusNotice(id) {
   var requestOptions = {
     method: 'GET',
   };
@@ -36,4 +36,3 @@ async function getBusNotice(id: number): Promise<ProcessedNotice> {
   var notice = JSON.parse(raw)
   return notice
 }
-
