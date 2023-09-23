@@ -214,11 +214,11 @@
 	header > *,
 	.col2,
 	.col3 {
-		opacity: 0.6;
+		opacity: 0.3;
 	}
 
 	.col1 :not(.keep) {
-		opacity: 0.6;
+		opacity: 0.3;
 	}
 
 	.col1 {
