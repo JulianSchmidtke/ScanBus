@@ -9,8 +9,8 @@ class ProcessedNotice {
         public LicensePlate: string,
         public UTCTimeStamp: string,
         public ImageContentType: string,
-        public Base64Image: string,
+        public Base64ImageLicensePlate: string,
         public Base64ImageCar: string,
-        public Base64ImageLicensePlate: string
+        public Base64Image: string
     ) { }
 }
