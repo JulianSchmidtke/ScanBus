@@ -84,7 +84,8 @@ public class PredictionHelper
             var distanceTwo = Vector2.Distance(new Vector2((float)(y.Left + y.Width / 2), (float)(y.Top + y.Height / 2)), anchor);
             return distanceOne > distanceTwo ? 1 : (distanceOne < distanceTwo ? -1 : 0);
         });
-        return (predictions.Where(x => x.Tag.Equals("Car", StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault(), predictions.Where(x => x.Tag.Equals("Registration Number", StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault());
+        const string type = "Ambulance";
+        return (predictions.Where(x => x.Tag.Equals(type, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault(), predictions.Where(x => x.Tag.Equals("Registration Number", StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault());
     }
 
     public static (int, int) GetAnchorPoint(string Base64Image)
@@ -105,8 +106,8 @@ public class PredictionHelper
         }
 
         var anchorPoint = PredictionHelper.GetAnchorPoint(Base64Image);
-        (var car, var licensePlate) = PredictionHelper.GetClosestPredictions(predictions, anchorPoint.Item1, anchorPoint.Item2);
-        return (car.Base64CroppedImage, licensePlate.Base64CroppedImage);
+        (var obstacle, var licensePlate) = PredictionHelper.GetClosestPredictions(predictions, anchorPoint.Item1, anchorPoint.Item2);
+        return (obstacle.Base64CroppedImage, licensePlate.Base64CroppedImage);
     }
 
 
