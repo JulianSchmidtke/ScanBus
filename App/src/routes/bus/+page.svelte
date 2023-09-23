@@ -14,6 +14,18 @@
 	const handleIconClick = () => {
 		modalOpen = true;
 	};
+
+	let fetchTimeout = -1;
+	$: {
+		if (!modalOpen) {
+			if (fetchTimeout > 0) window.clearTimeout(fetchTimeout);
+		} else {
+			fetchTimeout = window.setTimeout(() => {
+				console.log('Sending img to api');
+				// TODO send img to api
+			}, 4000);
+		}
+	}
 </script>
 
 <header>
@@ -119,7 +131,7 @@
 			<h1>Meldung abschicken?</h1>
 			<img src="https://source.unsplash.com/random/400x300/?nature,plants,dark=" />
 			<div class="buttons">
-				<div class="notify-button">Melden</div>
+				<div class="notify-button {modalOpen ? 'animate-button' : ''}">Melden</div>
 				<div class="cancel-button">Abbrechen</div>
 			</div>
 		</div>
@@ -318,12 +330,17 @@
 		position: relative;
 		background-color: #395a7b;
 		margin: auto;
-		top: 200px;
+		z-index: 10;
+		top: 175px;
 		padding: 16px;
 		width: 40%;
 		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 		animation-name: animatetop;
 		animation-duration: 0.4s;
+	}
+
+	.modal-content h1 {
+		padding-bottom: 16px;
 	}
 
 	.modal-content img {
@@ -333,15 +350,34 @@
 	}
 
 	.modal-content .buttons {
+		margin-top: 1rem;
 		display: flex;
 		justify-content: space-between;
 	}
 
 	.modal-content .buttons .notify-button {
+		position: relative;
 		display: inline-block;
+		z-index: 10;
 		padding: 1rem;
+		padding-inline: 3.5rem;
 		outline: 1px solid #9b2353;
-		background-color: rgba(155, 35, 83, 0.3);
+	}
+
+	.modal-content .buttons .notify-button::before {
+		content: '';
+		position: absolute;
+		background-color: #9b2353;
+		z-index: 5;
+		top: 0;
+		left: 0;
+		right: 100%;
+		bottom: 0;
+		transition: right 4s ease-in;
+	}
+
+	.modal-content .buttons .notify-button.animate-button::before {
+		right: 0;
 	}
 
 	.modal-content .buttons .cancel-button {
@@ -356,7 +392,7 @@
 			opacity: 0;
 		}
 		to {
-			top: 200px;
+			top: 175px;
 			opacity: 1;
 		}
 	}
