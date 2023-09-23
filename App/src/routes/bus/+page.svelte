@@ -17,27 +17,42 @@
 	};
 
 	let fetchTimeout = -1;
+	let countdownTimer = -1;
+	let countdown = 4;
 	$: {
 		if (typeof window !== undefined) {
 			if (!modalOpen) {
-				if (fetchTimeout > 0) window.clearTimeout(fetchTimeout);
+				if (fetchTimeout > -1) {
+					window.clearTimeout(fetchTimeout);
+					fetchTimeout = -1;
+				}
+				if (countdownTimer > -1) {
+					window.clearInterval(countdownTimer);
+					countdown = 4;
+					countdownTimer = -1;
+				}
 			} else {
-				fetchTimeout = window.setTimeout(async () => {
-					console.log('Sending img to api');
+				if (countdownTimer == -1)
+					countdownTimer = window.setInterval(() => {
+						countdown -= 1;
+					}, 1000);
+				if (fetchTimeout == -1)
+					fetchTimeout = window.setTimeout(async () => {
+						console.log('Sending img to api');
 
-					var busNotice = {
-						BusId: '1',
-						Driver: '2',
-						latitude: '51.954655',
-						longitude: '7.6262226',
-						utcTimeStamp: '1977-05-08T04:02:33.700Z',
-						ImageContentType: 'media/jpeg',
-						Base64Image: imageBase64
-					};
-					console.log(busNotice);
-					modalOpen = false;
-					await sendBusNotice();
-				}, 4000);
+						var busNotice = {
+							BusId: '1',
+							Driver: '2',
+							latitude: '51.954655',
+							longitude: '7.6262226',
+							utcTimeStamp: '1977-05-08T04:02:33.700Z',
+							ImageContentType: 'media/jpeg',
+							Base64Image: imageBase64
+						};
+						console.log(busNotice);
+						modalOpen = false;
+						await sendBusNotice();
+					}, 4000);
 			}
 		}
 	}
@@ -63,7 +78,7 @@
 			<div class="mdi mdi-map" />
 		</div>
 		<div class="col1-element keep" style="background-color: #9B2353;" on:click={handleIconClick}>
-			<div class="mdi mdi-car-off keep" />
+			<div class="mdi mdi-radar keep" />
 		</div>
 		<div class="col1-element" style="background-color: #2FA29B;">
 			<div class="mdi mdi-email" />
@@ -146,7 +161,7 @@
 			<h1>Meldung abschicken?</h1>
 			<img src="data:image/jpeg;base64, {imageBase64}" />
 			<div class="buttons">
-				<div class="notify-button {modalOpen ? 'animate-button' : ''}">Melden</div>
+				<div class="notify-button {modalOpen ? 'animate-button' : ''}">Melden {countdown}</div>
 				<div class="cancel-button">Abbrechen</div>
 			</div>
 		</div>
