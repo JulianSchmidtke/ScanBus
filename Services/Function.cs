@@ -20,14 +20,14 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 
 namespace ScanBus.Function;
-public class HelloWorld
+public class Function
 {
-    private readonly ILogger<HelloWorld> _logger;
+    private readonly ILogger<Function> _logger;
 
     private static List<BusNotice> busNotices = new();
     private static List<ProcessedNotice> processedNotices = new();
 
-    public HelloWorld(ILogger<HelloWorld> log)
+    public Function(ILogger<Function> log)
     {
         _logger = log;
     }
@@ -78,57 +78,29 @@ public class HelloWorld
     {
 
         PredictionHelper predictionHelper = new();
-        var res = predictionHelper.PredictImage(busNotice.Base64Image);
+        var predictions = predictionHelper.PredictImage(busNotice.Base64Image);
 
-        foreach(var pred in res)
-        {
-            pred.Base64CroppedImage = PredictionHelper.CropImage(busNotice.Base64Image, pred.Left, pred.Top, pred.Width, pred.Height);
-        }
-
-        var anchorPoint = GetAnchorPoint(busNotice.Base64Image);
-        (var car, var licensePlate) = GetClosestPredictions(res, anchorPoint.Item1, anchorPoint.Item2);
-
+        (var carImage, var licensePlateImage) = PredictionHelper.GetCroppedImages(busNotice.Base64Image, predictions);
         
         Address address = await CoordService.GetAddress(busNotice.Longitude, busNotice.Latitude);
+        
+        //Todo: OCR
+        var licensePlateText = OCRHelper.AnalyzeImage(licensePlateImage);
+        //Todo: Auto
+
         ProcessedNotice processedNotice = new()
         {
             Address = address,
             Base64Image = busNotice.Base64Image,
-            Base64ImageCar = car.Base64CroppedImage,
-            Base64ImageLicensePlate = licensePlate.Base64CroppedImage,
+            Base64ImageCar = carImage,
+            Base64ImageLicensePlate = licensePlateImage,
             Longitude = busNotice.Longitude,
             Latitude = busNotice.Latitude,
             Driver = busNotice.Driver,
             BusId = busNotice.BusId
         };
-
-        
-        //Todo: OCR
-        //Todo: Auto
-        
         processedNotices.Add(processedNotice);
     }
 
-    public (Prediction, Prediction) GetClosestPredictions(List<Prediction> predictions, int x, int y)
-    {
-        Vector2 anchor = new (x, y);
-        predictions.Sort((x,y) => 
-        {
-            var distanceOne = Vector2.Distance(new Vector2((float)(x.Left + x.Width/2), (float)(x.Top + x.Height / 2)), anchor);
-            var distanceTwo = Vector2.Distance(new Vector2((float)(y.Left + y.Width/2), (float)(y.Top + y.Height / 2)), anchor);
-            return distanceOne > distanceTwo ? 1 : (distanceOne < distanceTwo ? - 1 : 0);
-        });
-        return (predictions.Where(x => x.Tag.Equals("Car", StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault(), predictions.Where(x => x.Tag.Equals("Registration Number", StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault());
-    }
-
-    public (int, int) GetAnchorPoint(string Base64Image)
-    {
-        using var stream = new MemoryStream(Convert.FromBase64String(Base64Image));
-        using var outStream = new MemoryStream();
-        using (var image = Image.Load(stream))
-        {
-            return ((int)(image.Bounds.Width * 0.75), (int)(image.Bounds.Height * 0.75));
-        }
-    }
 
 }

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Numerics;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -57,9 +59,48 @@ public class PredictionHelper{
         using var outStream = new MemoryStream();
         using (var image = Image.Load(stream))
         {
-            image.Mutate(i => i.Crop(new Rectangle(){X = (int)(image.Bounds.Width * x), Y = (int)(image.Bounds.Height * y), Height = (int)(image.Bounds.Height * height), Width = (int)(image.Bounds.Width * width)}));
+            image.Mutate(i => i.Crop(new Rectangle(){
+                X = (int)(image.Bounds.Width * x), 
+                Y = (int)(image.Bounds.Height * y), 
+                Height = Math.Max(50, (int)(image.Bounds.Height * height)), 
+                Width = Math.Max(50,(int)(image.Bounds.Width * width))
+                }));
             image.Save(outStream, new JpegEncoder());
         }
         return Convert.ToBase64String(outStream.ToArray());
+    }
+
+    public static (Prediction, Prediction) GetClosestPredictions(List<Prediction> predictions, int x, int y)
+    {
+        Vector2 anchor = new (x, y);
+        predictions.Sort((x,y) => 
+        {
+            var distanceOne = Vector2.Distance(new Vector2((float)(x.Left + x.Width/2), (float)(x.Top + x.Height / 2)), anchor);
+            var distanceTwo = Vector2.Distance(new Vector2((float)(y.Left + y.Width/2), (float)(y.Top + y.Height / 2)), anchor);
+            return distanceOne > distanceTwo ? 1 : (distanceOne < distanceTwo ? - 1 : 0);
+        });
+        return (predictions.Where(x => x.Tag.Equals("Car", StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault(), predictions.Where(x => x.Tag.Equals("Registration Number", StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault());
+    }
+
+    public static (int, int) GetAnchorPoint(string Base64Image)
+    {
+        using var stream = new MemoryStream(Convert.FromBase64String(Base64Image));
+        using var outStream = new MemoryStream();
+        using (var image = Image.Load(stream))
+        {
+            return ((int)(image.Bounds.Width * 0.75), (int)(image.Bounds.Height * 0.75));
+        }
+    }
+
+    public static (string, string) GetCroppedImages(string Base64Image, List<Prediction> predictions)
+    {
+        foreach(var pred in predictions)
+        {
+            pred.Base64CroppedImage = PredictionHelper.CropImage(Base64Image, pred.Left, pred.Top, pred.Width, pred.Height);
+        }
+
+        var anchorPoint = PredictionHelper.GetAnchorPoint(Base64Image);
+        (var car, var licensePlate) = PredictionHelper.GetClosestPredictions(predictions, anchorPoint.Item1, anchorPoint.Item2);
+        return (car.Base64CroppedImage, licensePlate.Base64CroppedImage);
     }
 }
