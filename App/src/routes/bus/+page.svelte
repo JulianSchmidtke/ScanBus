@@ -43,8 +43,8 @@
 						var busNotice = {
 							BusId: '1',
 							Driver: '2',
-							latitude: '51.954655',
-							longitude: '7.6262226',
+							latitude: '51.95322',
+							longitude: '7.63817',
 							utcTimeStamp: '1977-05-08T04:02:33.700Z',
 							ImageContentType: 'media/jpeg',
 							Base64Image: imageBase64
